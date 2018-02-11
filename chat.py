@@ -4,7 +4,8 @@ import numpy as np
 import gensim
 import nltk
 from keras.models import load_model
-from gtts import gTTS
+
+import re
 
 import win32com.client as wincl
 
@@ -16,10 +17,22 @@ import os
 
 import theano
 
-theano.config.optimizer = "None"
-language = 'en'
+def untokenize(words):
 
-model = load_model('LSTM5000.h5')
+    text = ' '.join(words)
+    step1 = text.replace("`` ", '"').replace(" ''", '"').replace('. . .',  '...')
+    step2 = step1.replace(" ( ", " (").replace(" ) ", ") ")
+    step3 = re.sub(r' ([.,:;?!%]+)([ \'"`])', r"\1\2", step2)
+    step4 = re.sub(r' ([.,:;?!%]+)$', r"\1", step3)
+    step5 = step4.replace(" '", "'").replace(" n't", "n't").replace(
+         "can not", "cannot")
+    step6 = step5.replace(" ` ", " '")
+    return step6.strip()
+
+
+language = 'en'
+os.environ["KERAS_BACKEND"] = "theano"
+model = load_model('LSTM2000.h5')
 mod = gensim.models.Word2Vec.load('word2vec.bin');
 while (True):
     x = input("Enter the message:");
@@ -38,14 +51,26 @@ while (True):
     predictions = model.predict(sentvec)
     outputlist = [mod.most_similar([predictions[0][i]])[0][0] for i in range(15)]
     output = ' '.join(outputlist)
-    print(output)
-    # myobj = gTTS(text=output, lang=language, slow=False)
-    #
-    # # Saving the converted audio in a mp3 file named
-    # # welcome
-    # myobj.save("welcome.mp3")
-    #
-    # # Playing the converted file
-    # os.system("welcome.mp3")
-    speak = wincl.Dispatch("SAPI.SpVoice")
-    speak.Speak(output)
+    # print(output)
+    word_tokens=nltk.word_tokenize(output.lower())
+    # print(finaloutput)
+    stop_words = set(('kleiser', 'karluah'))
+    filtered_sentence = [w for w in word_tokens if not w in stop_words]
+
+
+
+    # for w in word_tokens:
+    #     if w not in stop_words:
+    #         filtered_sentence.append(w)
+
+
+    # print(filtered_sentence)
+
+
+    finaloutput1 =untokenize(filtered_sentence)
+    # finaloutput1="".join([" "+i if not i.startswith("'") and i not in string.punctuation else i for i in filtered_sentence]).strip()
+
+    print(finaloutput1)
+
+
+

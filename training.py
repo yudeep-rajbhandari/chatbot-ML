@@ -48,6 +48,6 @@ model.fit(x_train, y_train, nb_epoch=500, validation_data=(x_test, y_test))
 model.save('LSTM4500.h5');
 model.fit(x_train, y_train, nb_epoch=500, validation_data=(x_test, y_test))
 model.save('LSTM5000.h5');
-predictions = model.predict(x_test)
-mod = gensim.models.Word2Vec.load('word2vec.bin');
-[mod.most_similar([predictions[10][i]])[0] for i in range(15)]
+# predictions = model.predict(x_test)
+# mod = gensim.models.Word2Vec.load('word2vec.bin');
+# [mod.most_similar([predictions[10][i]])[0] for i in range(15)]
